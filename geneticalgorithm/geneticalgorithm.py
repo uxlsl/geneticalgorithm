@@ -284,6 +284,7 @@ class geneticalgorithm():
         
         
         
+        # 最后一位存cost
         pop=np.array([np.zeros(self.dim+1)]*self.pop_s)
         solo=np.zeros(self.dim+1)
         var=np.zeros(self.dim)       
@@ -322,9 +323,8 @@ class geneticalgorithm():
                 self.progress(t,self.iterate,status="GA is running...")
             #############################################################
             #Sort
+            # 根据最后一个cost
             pop = pop[pop[:,self.dim].argsort()]
-
-                
             
             if pop[0,self.dim]<self.best_function:
                 counter=0
@@ -364,8 +364,11 @@ class geneticalgorithm():
             # Select parents
             par=np.array([np.zeros(self.dim+1)]*self.par_s)
             
+            # 保留精英
             for k in range(0,self.num_elit):
                 par[k]=pop[k].copy()
+            
+            # 随机选择父代
             for k in range(self.num_elit,self.par_s):
                 index=np.searchsorted(cumprob,np.random.random())
                 par[k]=pop[index].copy()
@@ -384,15 +387,19 @@ class geneticalgorithm():
             #New generation
             pop=np.array([np.zeros(self.dim+1)]*self.pop_s)
             
+            # 复制一定数量的父代
             for k in range(0,self.par_s):
                 pop[k]=par[k].copy()
                 
             for k in range(self.par_s, self.pop_s, 2):
+
+                # 从杂交库中取二个
                 r1=np.random.randint(0,par_count)
                 r2=np.random.randint(0,par_count)
                 pvar1=ef_par[r1,: self.dim].copy()
                 pvar2=ef_par[r2,: self.dim].copy()
                 
+                # 交叉,求两个子代
                 ch=self.cross(pvar1,pvar2,self.c_type)
                 ch1=ch[0].copy()
                 ch2=ch[1].copy()
